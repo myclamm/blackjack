@@ -20,12 +20,7 @@
           return _this.render();
         };
       })(this));
-      this.render();
-      return this.collection.on('loses', (function(_this) {
-        return function() {
-          return console.log('you lose in HandView');
-        };
-      })(this));
+      return this.render();
     };
 
     HandView.prototype.render = function() {

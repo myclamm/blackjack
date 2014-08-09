@@ -13,13 +13,13 @@
     hand = null;
     beforeEach(function() {});
     describe('Manually set hands', function() {
-      return it("should expect dealer score to equal 8", function() {
+      return it("should expect dealer score to equal only the flipped card", function() {
         app = new AppView({
           model: new App()
         });
         app.model.get('dealerHand').models[0].set('value', 3);
         app.model.get('dealerHand').models[1].set('value', 5);
-        return expect(app.model.get('dealerHand').scores()[0]).to.equal(8);
+        return expect(app.model.get('dealerHand').scores()[0]).to.equal(5);
       });
     });
     describe('Automatically start dealer play', function() {
@@ -40,33 +40,55 @@
         app = new AppView({
           model: new App()
         });
-        console.log('playerHand1', app.model.get('playerHand'));
+        console.log(app.model.get('playerHand').scores(), 'playerHand1');
         app.model.get('playerHand').models[0].set('value', 10);
         app.model.get('playerHand').models[1].set('value', 7);
-        console.log('playerHand2', app.model.get('playerHand'));
-        console.log('dealerHand1', app.model.get('dealerHand'));
+        console.log(app.model.get('playerHand').scores(), 'playerHand2');
+        console.log(app.model.get('dealerHand').scores(), 'dealerHand1');
         app.model.get('dealerHand').models[0].set({
           'value': 10,
           'revealed': true
         });
         app.model.get('dealerHand').models[1].set('value', 1);
-        console.log(app.model.get('dealerHand').scores(), app.model.get('playerHand').scores());
+        console.log(app.model.get('dealerHand').scores(), 'dealerHand2');
         return assert.strictEqual(app.model.compareScores(), 'you lose');
       });
     });
     describe('User Win', function() {
       return it("should award win to user if user's score is closest to 21 and neither have busted", function() {
-        return assert.strictEqual(app.model.compareScores(), void 0);
+        app = new AppView({
+          model: new App()
+        });
+        app.model.get('playerHand').models[0].set('value', 10);
+        app.model.get('playerHand').models[1].set('value', 1);
+        app.model.get('dealerHand').models[0].set({
+          'value': 7,
+          'revealed': true
+        });
+        app.model.get('dealerHand').models[1].set('value', 3);
+        return assert.strictEqual(app.model.compareScores(), 'you win');
       });
     });
-    describe('Dealer Hit', function() {
-      return it("should keep hitting until dealer has a score greater than or equal to 17", function() {
-        return assert.strictEqual(app.model.compareScores(), void 0);
+    describe('Ace two scores', function() {
+      return it("should choose the closer of two scores to 21 that are not over 21 when an ace is in the hand", function() {
+        app = new AppView({
+          model: new App()
+        });
+        app.model.get('playerHand').models[0].set('value', 7);
+        app.model.get('playerHand').models[1].set('value', 1);
+        return assert.strictEqual(app.model.get('playerHand').onlyOneScore(), 18);
       });
     });
-    return describe('Dealer Bust', function() {
-      return it("should stop hitting dealer's hand when they've busted", function() {
-        return assert.strictEqual(app.model.compareScores(), void 0);
+    return describe('Hidden Ace', function() {
+      return it("should only show the score of the flipped card even if the first card is an ace", function() {
+        app = new AppView({
+          model: new App()
+        });
+        app.model.get('playerHand').models[0].set('value', 10);
+        app.model.get('playerHand').models[1].set('value', 7);
+        app.model.get('dealerHand').models[0].set('value', 1);
+        app.model.get('dealerHand').models[1].set('value', 7);
+        return assert.strictEqual(app.model.get('dealerHand').scores().length, 1);
       });
     });
   });

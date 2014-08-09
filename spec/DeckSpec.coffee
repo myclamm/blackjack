@@ -15,8 +15,3 @@ describe 'deck', ->
       assert.strictEqual deck.length, 49
       hand.playable && (assert.strictEqual deck.last(), hand.hit())
       hand.playable && (assert.strictEqual deck.length, 48)
-
-  # it should return a score
-  # it should trigger a loss when score is greater than 21
-  # it should trigger you win when dealer busts
-  # you should be able to hit if score is less than 21

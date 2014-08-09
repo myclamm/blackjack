@@ -14,7 +14,15 @@
 
     AppView.prototype.events = {
       "click .hit-button": function() {
-        return this.model.get('playerHand').hit();
+        if (this.model.get('playerHand').scores().length === 2) {
+          if (this.model.get('playerHand').scores()[0] < 21 || this.model.get('playerHand').scores()[1] < 21) {
+            return this.model.get('playerHand').hit();
+          }
+        } else {
+          if (this.model.get('playerHand').scores()[0] < 21) {
+            return this.model.get('playerHand').hit();
+          }
+        }
       },
       "click .stand-button": function() {
         return this.model.get('playerHand').stand();
@@ -22,7 +30,17 @@
     };
 
     AppView.prototype.initialize = function() {
-      return this.render();
+      this.render();
+      this.model.on('win', (function(_this) {
+        return function() {
+          return _this.$el.append('<span>You Win!</span>');
+        };
+      })(this));
+      return this.model.on('lose', (function(_this) {
+        return function() {
+          return _this.$el.append('<span>You Lose!</span>');
+        };
+      })(this));
     };
 
     AppView.prototype.render = function() {

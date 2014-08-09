@@ -6,27 +6,61 @@ class window.App extends Backbone.Model
     @set 'playerHand', deck.dealPlayer()
     @set 'dealerHand', deck.dealDealer()
 
-    (@get 'playerHand').on 'stand', =>
-      (@get 'dealerHand').at(0).flip()
-      while (@get("dealerHand").scores()[0] < 17) or (@get("dealerHand").scores()[1] < 17 && @get("dealerHand").scores()[1])
-        # console.log((@get 'dealerHand').scores())
-        (@get 'dealerHand').hit()
-        # console.log (@get 'dealerHand').length
+    (@get 'playerHand').on 'loses', =>
       @compareScores()
 
+    (@get 'playerHand').on 'stand', =>
+
+      (@get 'dealerHand').at(0).flip()
+      @dealerPlay()
+
+
+  dealerPlay: ->
+    dealerScore = (@get 'dealerHand').scores()
+    console.log(dealerScore)
+
+    if dealerScore.length == 2
+      if dealerScore[0] == 21 || dealerScore[1] == 21
+        @compareScores()
+      else while (dealerScore[0] < 17 || dealerScore[1] < 17)
+        (@get 'dealerHand').hit()
+        dealerScore = (@get 'dealerHand').scores()
+
+    else
+      while (dealerScore[0] < 17)
+        (@get 'dealerHand').hit()
+        dealerScore = (@get 'dealerHand').scores()
+        if dealerScore.length == 2
+          @dealerPlay()
+
+    @compareScores()
+
+
   compareScores: ->
-    if 21-(@get 'playerHand').scores()[0] < 21-(@get 'dealerHand').scores()[0]
-      console.log 'you win'
+    playerScore = (@get 'playerHand').scores()
+    dealerScore = (@get 'dealerHand').scores()
+
+    if playerScore.length == 2
+      playerScore = (@get 'playerHand').onlyOneScore()
+    else
+      playerScore = (@get 'playerHand').scores()[0]
+    console.log('player Score', playerScore)
+
+    if dealerScore.length == 2
+      dealerScore = (@get 'dealerHand').onlyOneScore()
+      console.log('dealer Score', dealerScore)
+    else
+      dealerScore = (@get 'dealerHand').scores()[0]
+
+    if dealerScore > 21
+      @trigger('win')
       return 'you win'
-    else if 21-(@get 'playerHand').scores()[1] < 21-(@get 'dealerHand').scores()[1]
-      console.log 'you win'
-      return 'you win'
-    else if 21-(@get 'playerHand').scores()[1] < 21-(@get 'dealerHand').scores()[0]
-      console.log 'you win'
-      return 'you win'
-    else if 21-(@get 'playerHand').scores()[0] < 21-(@get 'dealerHand').scores()[1]
-      console.log 'you win'
+    else if playerScore > 21
+      @trigger('lose')
+      return 'you lose'
+    else if 21 - playerScore < 21 - dealerScore
+      @trigger('win')
       return 'you win'
     else
-      console.log 'you lose in AppView'
+      @trigger('lose')
       return 'you lose'

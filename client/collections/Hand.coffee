@@ -4,7 +4,7 @@ class window.Hand extends Backbone.Collection
 
   initialize: (array, @deck, @isDealer) ->
 
-    @on 'add', (card) -> if (@scores()[0] > 21) or (@scores()[1]>21) then @trigger 'loses'
+    @on 'add', (card) -> if (@scores()[0] > 21) then @trigger 'loses'
 
     #   if(this.scores()[0] > 21 || this.scores()[1] > 21){
     #     this.trigger('loses')
@@ -29,4 +29,14 @@ class window.Hand extends Backbone.Collection
     score = @reduce (score, card) ->
       score + if card.get 'revealed' then card.get 'value' else 0
     , 0
-    if hasAce then [score, score + 10] else [score]
+    if (hasAce && @models[0].get 'revealed') then [score, score + 10] else [score]
+
+  onlyOneScore : ->
+    if(@scores()[0] > 21 && @scores()[1] <= 21)
+      return @scores()[1]
+    else if(@scores()[1] > 21 && @scores()[0] <= 21)
+      return @scores()[0]
+    else if(21 - @scores()[0] < 21 - @scores()[1])
+      return @scores()[0]
+    else
+      return @scores()[1]

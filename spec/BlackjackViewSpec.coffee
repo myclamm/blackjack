@@ -9,12 +9,12 @@ describe 'app', ->
   beforeEach ->
 
   describe 'Manually set hands', ->
-    it "should expect dealer score to equal 8", ->
+    it "should expect dealer score to equal only the flipped card", ->
       app = new AppView(model: new App())
       app.model.get('dealerHand').models[0].set('value', 3)
       app.model.get('dealerHand').models[1].set('value', 5)
 
-      expect(app.model.get('dealerHand').scores()[0]).to.equal(8)
+      expect(app.model.get('dealerHand').scores()[0]).to.equal(5)
 
 
   describe 'Automatically start dealer play', ->
@@ -34,27 +34,59 @@ describe 'app', ->
     it "should award win to dealer if dealer's score is to 21 and neither have busted", ->
 
       app = new AppView(model: new App())
-      console.log('playerHand1', app.model.get('playerHand'))
+      console.log(app.model.get('playerHand').scores(), 'playerHand1')
       app.model.get('playerHand').models[0].set('value', 10)
       app.model.get('playerHand').models[1].set('value', 7)
-      console.log('playerHand2', app.model.get('playerHand'))
+      console.log(app.model.get('playerHand').scores(), 'playerHand2')
 
-      console.log('dealerHand1', app.model.get('dealerHand'))
+
+      console.log(app.model.get('dealerHand').scores(), 'dealerHand1')
       app.model.get('dealerHand').models[0].set({'value': 10, 'revealed':true})
       app.model.get('dealerHand').models[1].set('value', 1)
-      console.log(app.model.get('dealerHand').scores(), app.model.get('playerHand').scores())
-      # debugger;
-      # compareScores is failing! Fix this
+      console.log(app.model.get('dealerHand').scores(), 'dealerHand2')
+
       assert.strictEqual app.model.compareScores(), 'you lose'
 
   describe 'User Win', ->
     it "should award win to user if user's score is closest to 21 and neither have busted", ->
-      assert.strictEqual app.model.compareScores(), undefined
+      app = new AppView(model: new App())
+      app.model.get('playerHand').models[0].set('value', 10)
+      app.model.get('playerHand').models[1].set('value', 1)
 
-  describe 'Dealer Hit', ->
-    it "should keep hitting until dealer has a score greater than or equal to 17", ->
-      assert.strictEqual app.model.compareScores(), undefined
+      app.model.get('dealerHand').models[0].set({'value': 7, 'revealed':true})
+      app.model.get('dealerHand').models[1].set('value', 3)
 
-  describe 'Dealer Bust', ->
-    it "should stop hitting dealer's hand when they've busted", ->
-      assert.strictEqual app.model.compareScores(), undefined
+      # compareScores is failing! Fix this
+      assert.strictEqual app.model.compareScores(), 'you win'
+
+  describe 'Ace two scores', ->
+    it "should choose the closer of two scores to 21 that are not over 21 when an ace is in the hand", ->
+      app = new AppView(model: new App())
+      app.model.get('playerHand').models[0].set('value', 7)
+      app.model.get('playerHand').models[1].set('value', 1)
+
+      assert.strictEqual app.model.get('playerHand').onlyOneScore(), 18
+
+  describe 'Hidden Ace', ->
+    it "should only show the score of the flipped card even if the first card is an ace", ->
+      app = new AppView(model: new App())
+      app.model.get('playerHand').models[0].set('value', 10)
+      app.model.get('playerHand').models[1].set('value', 7)
+
+      app.model.get('dealerHand').models[0].set('value', 1)
+      app.model.get('dealerHand').models[1].set('value', 7)
+
+      assert.strictEqual app.model.get('dealerHand').scores().length, 1
+
+
+  # describe 'Dealer Bust', ->
+  #   it "should stop hitting dealer's hand when they've busted", ->
+  #     app = new AppView(model: new App())
+  #     app.model.get('playerHand').models[0].set('value', 10)
+  #     app.model.get('playerHand').models[1].set('value', 7)
+  #     app.model.get('dealerHand').models[0].set('value', 3)
+  #     app.model.get('dealerHand').models[1].set('value', 5)
+
+  #     app.model.get('playerHand').stand()
+
+  #     expect(app.model.get('dealerHand').scores()).to.be.less.than(27)

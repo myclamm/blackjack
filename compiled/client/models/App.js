@@ -15,32 +15,71 @@
       this.set('deck', deck = new Deck());
       this.set('playerHand', deck.dealPlayer());
       this.set('dealerHand', deck.dealDealer());
+      (this.get('playerHand')).on('loses', (function(_this) {
+        return function() {
+          return _this.compareScores();
+        };
+      })(this));
       return (this.get('playerHand')).on('stand', (function(_this) {
         return function() {
           (_this.get('dealerHand')).at(0).flip();
-          while ((_this.get("dealerHand").scores()[0] < 17) || (_this.get("dealerHand").scores()[1] < 17 && _this.get("dealerHand").scores()[1])) {
-            (_this.get('dealerHand')).hit();
-          }
-          return _this.compareScores();
+          return _this.dealerPlay();
         };
       })(this));
     };
 
+    App.prototype.dealerPlay = function() {
+      var dealerScore;
+      dealerScore = (this.get('dealerHand')).scores();
+      console.log(dealerScore);
+      if (dealerScore.length === 2) {
+        if (dealerScore[0] === 21 || dealerScore[1] === 21) {
+          this.compareScores();
+        } else {
+          while (dealerScore[0] < 17 || dealerScore[1] < 17) {
+            (this.get('dealerHand')).hit();
+            dealerScore = (this.get('dealerHand')).scores();
+          }
+        }
+      } else {
+        while (dealerScore[0] < 17) {
+          (this.get('dealerHand')).hit();
+          dealerScore = (this.get('dealerHand')).scores();
+          if (dealerScore.length === 2) {
+            this.dealerPlay();
+          }
+        }
+      }
+      return this.compareScores();
+    };
+
     App.prototype.compareScores = function() {
-      if (21 - (this.get('playerHand')).scores()[0] < 21 - (this.get('dealerHand')).scores()[0]) {
-        console.log('you win');
+      var dealerScore, playerScore;
+      playerScore = (this.get('playerHand')).scores();
+      dealerScore = (this.get('dealerHand')).scores();
+      if (playerScore.length === 2) {
+        playerScore = (this.get('playerHand')).onlyOneScore();
+      } else {
+        playerScore = (this.get('playerHand')).scores()[0];
+      }
+      console.log('player Score', playerScore);
+      if (dealerScore.length === 2) {
+        dealerScore = (this.get('dealerHand')).onlyOneScore();
+        console.log('dealer Score', dealerScore);
+      } else {
+        dealerScore = (this.get('dealerHand')).scores()[0];
+      }
+      if (dealerScore > 21) {
+        this.trigger('win');
         return 'you win';
-      } else if (21 - (this.get('playerHand')).scores()[1] < 21 - (this.get('dealerHand')).scores()[1]) {
-        console.log('you win');
-        return 'you win';
-      } else if (21 - (this.get('playerHand')).scores()[1] < 21 - (this.get('dealerHand')).scores()[0]) {
-        console.log('you win');
-        return 'you win';
-      } else if (21 - (this.get('playerHand')).scores()[0] < 21 - (this.get('dealerHand')).scores()[1]) {
-        console.log('you win');
+      } else if (playerScore > 21) {
+        this.trigger('lose');
+        return 'you lose';
+      } else if (21 - playerScore < 21 - dealerScore) {
+        this.trigger('win');
         return 'you win';
       } else {
-        console.log('you lose in AppView');
+        this.trigger('lose');
         return 'you lose';
       }
     };

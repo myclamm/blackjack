@@ -18,7 +18,7 @@
       this.deck = deck;
       this.isDealer = isDealer;
       return this.on('add', function(card) {
-        if ((this.scores()[0] > 21) || (this.scores()[1] > 21)) {
+        if (this.scores()[0] > 21) {
           return this.trigger('loses');
         }
       });
@@ -40,10 +40,22 @@
       score = this.reduce(function(score, card) {
         return score + (card.get('revealed') ? card.get('value') : 0);
       }, 0);
-      if (hasAce) {
+      if (hasAce && this.models[0].get('revealed')) {
         return [score, score + 10];
       } else {
         return [score];
+      }
+    };
+
+    Hand.prototype.onlyOneScore = function() {
+      if (this.scores()[0] > 21 && this.scores()[1] <= 21) {
+        return this.scores()[1];
+      } else if (this.scores()[1] > 21 && this.scores()[0] <= 21) {
+        return this.scores()[0];
+      } else if (21 - this.scores()[0] < 21 - this.scores()[1]) {
+        return this.scores()[0];
+      } else {
+        return this.scores()[1];
       }
     };
 
