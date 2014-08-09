@@ -4,6 +4,18 @@ class window.Hand extends Backbone.Collection
 
   initialize: (array, @deck, @isDealer) ->
 
+    @on 'add', (card) -> if (@scores()[0] > 21) or (@scores()[1]>21) then @trigger 'loses'
+
+    #   if(this.scores()[0] > 21 || this.scores()[1] > 21){
+    #     this.trigger('loses')
+    #   }
+
+
+# @collection.on 'add remove change', => @render()
+
+  stand: =>
+    @trigger 'stand'
+
   hit: ->
     @add(@deck.pop()).last()
 
