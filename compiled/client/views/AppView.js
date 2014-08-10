@@ -10,7 +10,7 @@
       return AppView.__super__.constructor.apply(this, arguments);
     }
 
-    AppView.prototype.template = _.template('<button class="hit-button">Hit</button> <button class="stand-button">Stand</button> <div class="player-hand-container"></div> <div class="dealer-hand-container"></div>');
+    AppView.prototype.template = _.template('<button class="hit-button">Hit</button> <button class="stand-button">Stand</button> <div class="player-hand-container"></div> <div class="dealer-hand-container"></div> <div class="previous-hands-container"></div>');
 
     AppView.prototype.events = {
       "click .hit-button": function() {
@@ -33,11 +33,13 @@
       this.render();
       this.model.on('win', (function(_this) {
         return function() {
+          _this.model.get('previousRounds').add(new PreviousRound(_this.model.get('playerHand'), _this.model.get('dealerHand')));
           return _this.$el.append('<span>You Win!</span>');
         };
       })(this));
       return this.model.on('lose', (function(_this) {
         return function() {
+          _this.model.get('previousRounds').add(new PreviousRound(_this.model.get('playerHand'), _this.model.get('dealerHand')));
           return _this.$el.append('<span>You Lose!</span>');
         };
       })(this));
@@ -49,8 +51,11 @@
       this.$('.player-hand-container').html(new HandView({
         collection: this.model.get('playerHand')
       }).el);
-      return this.$('.dealer-hand-container').html(new HandView({
+      this.$('.dealer-hand-container').html(new HandView({
         collection: this.model.get('dealerHand')
+      }).el);
+      return this.$('.previous-hands-container').html(new PreviousRoundsView({
+        collection: this.model.get('previousRounds')
       }).el);
     };
 

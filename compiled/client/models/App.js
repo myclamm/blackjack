@@ -11,10 +11,13 @@
     }
 
     App.prototype.initialize = function() {
-      var deck;
+      var deck, previousRounds;
       this.set('deck', deck = new Deck());
       this.set('playerHand', deck.dealPlayer());
       this.set('dealerHand', deck.dealDealer());
+      this.set('previousRounds', previousRounds = new PreviousRounds());
+      this.get('previousRounds').add(new PreviousRound(this.get('deck').dealPlayer(), this.get('deck').dealPlayer()));
+      console.log('prevRound in App Model', this.get('previousRounds'));
       (this.get('playerHand')).on('loses', (function(_this) {
         return function() {
           return _this.compareScores();
@@ -31,7 +34,6 @@
     App.prototype.dealerPlay = function() {
       var dealerScore;
       dealerScore = (this.get('dealerHand')).scores();
-      console.log(dealerScore);
       if (dealerScore.length === 2) {
         if (dealerScore[0] === 21 || dealerScore[1] === 21) {
           this.compareScores();
@@ -62,10 +64,8 @@
       } else {
         playerScore = (this.get('playerHand')).scores()[0];
       }
-      console.log('player Score', playerScore);
       if (dealerScore.length === 2) {
         dealerScore = (this.get('dealerHand')).onlyOneScore();
-        console.log('dealer Score', dealerScore);
       } else {
         dealerScore = (this.get('dealerHand')).scores()[0];
       }

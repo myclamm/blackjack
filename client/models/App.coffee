@@ -5,7 +5,11 @@ class window.App extends Backbone.Model
     @set 'deck', deck = new Deck()
     @set 'playerHand', deck.dealPlayer()
     @set 'dealerHand', deck.dealDealer()
-
+    @set 'previousRounds', previousRounds = new PreviousRounds()
+    # THIS IS TEMPORARY REMOVE WHEN NOT NEEDED
+    # debugger;
+    @get('previousRounds').add(new PreviousRound(@get('deck').dealPlayer(), @get('deck').dealPlayer()))
+    console.log('prevRound in App Model', @get('previousRounds'))
     (@get 'playerHand').on 'loses', =>
       @compareScores()
 
@@ -17,7 +21,6 @@ class window.App extends Backbone.Model
 
   dealerPlay: ->
     dealerScore = (@get 'dealerHand').scores()
-    console.log(dealerScore)
 
     if dealerScore.length == 2
       if dealerScore[0] == 21 || dealerScore[1] == 21
@@ -44,11 +47,9 @@ class window.App extends Backbone.Model
       playerScore = (@get 'playerHand').onlyOneScore()
     else
       playerScore = (@get 'playerHand').scores()[0]
-    console.log('player Score', playerScore)
 
     if dealerScore.length == 2
       dealerScore = (@get 'dealerHand').onlyOneScore()
-      console.log('dealer Score', dealerScore)
     else
       dealerScore = (@get 'dealerHand').scores()[0]
 

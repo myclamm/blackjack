@@ -34,16 +34,12 @@ describe 'app', ->
     it "should award win to dealer if dealer's score is to 21 and neither have busted", ->
 
       app = new AppView(model: new App())
-      console.log(app.model.get('playerHand').scores(), 'playerHand1')
+
       app.model.get('playerHand').models[0].set('value', 10)
       app.model.get('playerHand').models[1].set('value', 7)
-      console.log(app.model.get('playerHand').scores(), 'playerHand2')
 
-
-      console.log(app.model.get('dealerHand').scores(), 'dealerHand1')
       app.model.get('dealerHand').models[0].set({'value': 10, 'revealed':true})
       app.model.get('dealerHand').models[1].set('value', 1)
-      console.log(app.model.get('dealerHand').scores(), 'dealerHand2')
 
       assert.strictEqual app.model.compareScores(), 'you lose'
 
@@ -56,7 +52,6 @@ describe 'app', ->
       app.model.get('dealerHand').models[0].set({'value': 7, 'revealed':true})
       app.model.get('dealerHand').models[1].set('value', 3)
 
-      # compareScores is failing! Fix this
       assert.strictEqual app.model.compareScores(), 'you win'
 
   describe 'Ace two scores', ->
@@ -78,15 +73,10 @@ describe 'app', ->
 
       assert.strictEqual app.model.get('dealerHand').scores().length, 1
 
+  describe 'Storing Previous Rounds', ->
+    it "should add the round to the previous rounds collection when game is complete", ->
+      app = new AppView(model: new App())
+      app.model.get('playerHand').stand()
 
-  # describe 'Dealer Bust', ->
-  #   it "should stop hitting dealer's hand when they've busted", ->
-  #     app = new AppView(model: new App())
-  #     app.model.get('playerHand').models[0].set('value', 10)
-  #     app.model.get('playerHand').models[1].set('value', 7)
-  #     app.model.get('dealerHand').models[0].set('value', 3)
-  #     app.model.get('dealerHand').models[1].set('value', 5)
+      assert.strictEqual app.model.get('previousRounds').length, 1
 
-  #     app.model.get('playerHand').stand()
-
-  #     expect(app.model.get('dealerHand').scores()).to.be.less.than(27)

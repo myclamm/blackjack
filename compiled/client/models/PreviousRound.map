@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "PreviousRound.js",
+  "sourceRoot": "../../..",
+  "sources": [
+    "client/models/PreviousRound.coffee"
+  ],
+  "names": [],
+  "mappings": ";AAAA;AAAA,MAAA;mSAAA;;AAAA,EAAM,MAAM,CAAC;AAEX,oCAAA,CAAA;;;;KAAA;;AAAA,4BAAA,UAAA,GAAY,SAAC,UAAD,EAAa,UAAb,GAAA;AACV,MAAA,OAAO,CAAC,GAAR,CAAY,oBAAZ,EAAkC,UAAlC,EAA8C,UAA9C,CAAA,CAAA;aACA,IAAC,CAAA,GAAD,CACE;AAAA,QAAA,UAAA,EAAY,UAAZ;AAAA,QACA,UAAA,EAAY,UADZ;OADF,EAFU;IAAA,CAAZ,CAAA;;yBAAA;;KAFiC,QAAQ,CAAC,MAA5C,CAAA;AAAA"
+}

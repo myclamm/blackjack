@@ -40,17 +40,13 @@
         app = new AppView({
           model: new App()
         });
-        console.log(app.model.get('playerHand').scores(), 'playerHand1');
         app.model.get('playerHand').models[0].set('value', 10);
         app.model.get('playerHand').models[1].set('value', 7);
-        console.log(app.model.get('playerHand').scores(), 'playerHand2');
-        console.log(app.model.get('dealerHand').scores(), 'dealerHand1');
         app.model.get('dealerHand').models[0].set({
           'value': 10,
           'revealed': true
         });
         app.model.get('dealerHand').models[1].set('value', 1);
-        console.log(app.model.get('dealerHand').scores(), 'dealerHand2');
         return assert.strictEqual(app.model.compareScores(), 'you lose');
       });
     });
@@ -79,7 +75,7 @@
         return assert.strictEqual(app.model.get('playerHand').onlyOneScore(), 18);
       });
     });
-    return describe('Hidden Ace', function() {
+    describe('Hidden Ace', function() {
       return it("should only show the score of the flipped card even if the first card is an ace", function() {
         app = new AppView({
           model: new App()
@@ -89,6 +85,15 @@
         app.model.get('dealerHand').models[0].set('value', 1);
         app.model.get('dealerHand').models[1].set('value', 7);
         return assert.strictEqual(app.model.get('dealerHand').scores().length, 1);
+      });
+    });
+    return describe('Storing Previous Rounds', function() {
+      return it("should add the round to the previous rounds collection when game is complete", function() {
+        app = new AppView({
+          model: new App()
+        });
+        app.model.get('playerHand').stand();
+        return assert.strictEqual(app.model.get('previousRounds').length, 1);
       });
     });
   });
